@@ -36,6 +36,7 @@ class Scorer(object):
                                    stderr=subprocess.PIPE)
         out,err = process.communicate(open(filename).read())
         map(sys.stderr.write, err)
+        map(sys.stderr.write, out)
         precision, recall, aer = 0.0, 0.0, 0.0
         #look for output like this:
         #    Precision = 0.235149
