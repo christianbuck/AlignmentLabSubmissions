@@ -24,7 +24,7 @@ class Scorer(object):
                                           file_date,
                                           result[0], result[1], result[2]) )
 
-    def _score(self, filename, gold_data):
+    def _score(self, filename):
         "score one alignment file, return (precision, recall, AER)"
         cmd = "%s -d %s -n 0" %(self.grader, self.gold_data)
         sys.stderr.write(cmd)
