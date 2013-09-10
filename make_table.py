@@ -14,12 +14,13 @@ class Scorer(object):
         self.colnames = ['user', 'date', 'precision', 'recall', 'aer']
         self.submissions = []
         for directory, dirnames, filenames in os.walk(root_dir):
-            if 'alignment.sorted' in filenames:
-                alignment_file = os.path.join(directory, 'alignment.sorted')
+            if 'alignment.sorted' in filenames and 'alignment' in filenames:
+                alignment_file = os.path.join(directory, 'alignment')
                 alignment_file = os.path.abspath(alignment_file)
+                sorted_alignment_file = "%s.sorted" %alignment_file
                 file_date = time.ctime(os.path.getmtime(alignment_file))
                 user_name = os.path.split(directory)[-1]
-                result = self._score(alignment_file)
+                result = self._score(sorted_alignment_file)
                 self.submissions.append( (user_name,
                                           file_date,
                                           result[0], result[1], result[2]) )
@@ -31,8 +32,10 @@ class Scorer(object):
         process = subprocess.Popen(cmd.split(),
                                    shell=True,
                                    stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
-        out = process.communicate(open(filename).read())[0]
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        out,err = process.communicate(open(filename).read())
+        map(sys.stderr.write, err)
         precision, recall, aer = 0.0, 0.0, 0.0
         #look for output like this:
         #    Precision = 0.235149
