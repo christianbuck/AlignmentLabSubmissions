@@ -95,7 +95,7 @@ if __name__ == "__main__":
     htmltable = str(CSV2HTML('results.csv'))
 
     html = open(args.template).read()
-    sys.stdout.write(html.replace('TABLEGOESHERE', htmltable))
+    sys.stdout.write(html.replace("TABLEGOESHERE", htmltable))
 
     #for linenr, line in enumerate(sys.stdin):
     #    line = line.strip().split()
