@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-from collections import defaultdict
-from itertools import imap, izip
 import os
 import time
 import subprocess
@@ -10,29 +8,35 @@ import csv
 
 class Scorer(object):
 
-    def __init__(self, root_dir, grader='./grade'):
+    def __init__(self, root_dir, grader, gold_data):
         self.grader = grader
+        self.gold_data = gold_data
         self.colnames = ['user', 'date', 'precision', 'recall', 'aer']
         self.submissions = []
         for directory, dirnames, filenames in os.walk(root_dir):
-            if 'alignment' in filenames:
+            if 'alignment.sorted' in filenames and 'alignment' in filenames:
                 alignment_file = os.path.join(directory, 'alignment')
                 alignment_file = os.path.abspath(alignment_file)
+                sorted_alignment_file = "%s.sorted" %alignment_file
                 file_date = time.ctime(os.path.getmtime(alignment_file))
                 user_name = os.path.split(directory)[-1]
-                result = self._score(alignment_file)
+                result = self._score(sorted_alignment_file)
                 self.submissions.append( (user_name,
                                           file_date,
                                           result[0], result[1], result[2]) )
 
     def _score(self, filename):
         "score one alignment file, return (precision, recall, AER)"
-        process = subprocess.Popen(self.grader.split(),
-                                   shell=True,
+        cmd = "%s -d %s -n 0" %(self.grader, self.gold_data)
+        sys.stderr.write(cmd + "\n")
+        process = subprocess.Popen(cmd.split(),
+                                   shell=False,
                                    stdin=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
-        sys.stderr.write("%s %s\n" %(self.grader, filename))
-        out = process.communicate(open(filename).read())[0]
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        out,err = process.communicate(open(filename).read())
+        map(sys.stderr.write, err)
+        map(sys.stderr.write, out)
         precision, recall, aer = 0.0, 0.0, 0.0
         #look for output like this:
         #    Precision = 0.235149
@@ -84,11 +88,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('root', help="root directory, containing submissions")
-    parser.add_argument('grader', help="root directory, containing submissions")
+    parser.add_argument('grader', help="grading script")
+    parser.add_argument('gold', help="location of aligned data")
     parser.add_argument('template', help="HTML template file for leaderboad")
     args = parser.parse_args(sys.argv[1:])
 
-    scorer = Scorer(args.root)
+    scorer = Scorer(args.root, args.grader, args.gold)
     scorer.write_csv('results.csv')
 
     htmltable = str(CSV2HTML('results.csv'))
