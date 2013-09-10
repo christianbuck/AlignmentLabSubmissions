@@ -12,7 +12,7 @@ class Scorer(object):
 
     def __init__(self, root_dir, grader='./grade'):
         self.grader = grader
-        self.colnames = ['file', 'date', 'user', 'precision', 'recall', 'aer']
+        self.colnames = ['user', 'date', 'precision', 'recall', 'aer']
         self.submissions = []
         for directory, dirnames, filenames in os.walk(root_dir):
             if 'alignment' in filenames:
@@ -21,9 +21,8 @@ class Scorer(object):
                 file_date = time.ctime(os.path.getmtime(alignment_file))
                 user_name = os.path.split(directory)[-1]
                 result = self._score(alignment_file)
-                self.submissions.append( (alignment_file,
+                self.submissions.append( (user_name,
                                           file_date,
-                                          user_name,
                                           result[0], result[1], result[2]) )
 
     def _score(self, filename):
@@ -60,6 +59,7 @@ class CSV2HTML(object):
         self.html.append('<table cellspacing="1" class="tablesorter">')
 
         for linenr, line in enumerate(csv.reader(open(filename))):
+
             if linenr == 0:
                 self.html.append('\t<thead>')
                 self.html.append('\t<tr>')
