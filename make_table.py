@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-from collections import defaultdict
-from itertools import imap, izip
 import os
 import time
 import subprocess
@@ -10,13 +8,14 @@ import csv
 
 class Scorer(object):
 
-    def __init__(self, root_dir, grader='./grade'):
+    def __init__(self, root_dir, grader, gold_data):
         self.grader = grader
+        self.gold_data = gold_data
         self.colnames = ['user', 'date', 'precision', 'recall', 'aer']
         self.submissions = []
         for directory, dirnames, filenames in os.walk(root_dir):
             if 'alignment' in filenames:
-                alignment_file = os.path.join(directory, 'alignment')
+                alignment_file = os.path.join(directory, 'alignment.sorted')
                 alignment_file = os.path.abspath(alignment_file)
                 file_date = time.ctime(os.path.getmtime(alignment_file))
                 user_name = os.path.split(directory)[-1]
@@ -25,13 +24,14 @@ class Scorer(object):
                                           file_date,
                                           result[0], result[1], result[2]) )
 
-    def _score(self, filename):
+    def _score(self, filename, gold_data):
         "score one alignment file, return (precision, recall, AER)"
-        process = subprocess.Popen(self.grader.split(),
+        cmd = "%s -d %s -n 0" %(self.grader, self.gold_data)
+        sys.stderr.write(cmd)
+        process = subprocess.Popen(cmd.split(),
                                    shell=True,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE)
-        sys.stderr.write("%s %s\n" %(self.grader, filename))
         out = process.communicate(open(filename).read())[0]
         precision, recall, aer = 0.0, 0.0, 0.0
         #look for output like this:
@@ -84,11 +84,12 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('root', help="root directory, containing submissions")
-    parser.add_argument('grader', help="root directory, containing submissions")
+    parser.add_argument('grader', help="grading script")
+    parser.add_argument('gold', help="location of aligned data")
     parser.add_argument('template', help="HTML template file for leaderboad")
     args = parser.parse_args(sys.argv[1:])
 
-    scorer = Scorer(args.root)
+    scorer = Scorer(args.root, args.grader, args.gold)
     scorer.write_csv('results.csv')
 
     htmltable = str(CSV2HTML('results.csv'))
