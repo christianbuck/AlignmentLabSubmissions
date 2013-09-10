@@ -67,12 +67,14 @@ class CSV2HTML(object):
                     self.html.append("\t\t<th>%s</th>" %val)
                 self.html.append('\t</tr>')
                 self.html.append('\t</thead>')
+                self.html.append('\t<tbody>')
             else:
                 self.html.append('\t<tr>')
                 for val in line:
                     self.html.append("\t\t<td>%s</td>" %val)
                 self.html.append('\t</tr>')
 
+        self.html.append('\t</tbody>')
         self.html.append('</table>')
 
     def __str__(self):
