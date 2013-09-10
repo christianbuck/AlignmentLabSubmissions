@@ -30,7 +30,7 @@ class Scorer(object):
         cmd = "%s -d %s -n 0" %(self.grader, self.gold_data)
         sys.stderr.write(cmd + "\n")
         process = subprocess.Popen(cmd.split(),
-                                   shell=True,
+                                   shell=False,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
