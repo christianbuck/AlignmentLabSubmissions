@@ -32,7 +32,7 @@ class Scorer(object):
                                    shell=True,
                                    stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE)
-        print self.grader, filename
+        sys.stderr.write("%s %s\n" %(self.grader, filename))
         out = process.communicate(open(filename).read())[0]
         precision, recall, aer = 0.0, 0.0, 0.0
         #look for output like this:
