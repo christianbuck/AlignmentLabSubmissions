@@ -14,7 +14,7 @@ class Scorer(object):
         self.colnames = ['user', 'date', 'precision', 'recall', 'aer']
         self.submissions = []
         for directory, dirnames, filenames in os.walk(root_dir):
-            if 'alignment' in filenames:
+            if 'alignment.sorted' in filenames:
                 alignment_file = os.path.join(directory, 'alignment.sorted')
                 alignment_file = os.path.abspath(alignment_file)
                 file_date = time.ctime(os.path.getmtime(alignment_file))
@@ -27,7 +27,7 @@ class Scorer(object):
     def _score(self, filename):
         "score one alignment file, return (precision, recall, AER)"
         cmd = "%s -d %s -n 0" %(self.grader, self.gold_data)
-        sys.stderr.write(cmd)
+        sys.stderr.write(cmd + "\n")
         process = subprocess.Popen(cmd.split(),
                                    shell=True,
                                    stdin=subprocess.PIPE,
