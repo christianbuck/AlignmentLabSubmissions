@@ -1,7 +1,9 @@
 A very simple submission by Rudolf.
 Still the Dice, just with some simple heuristics (diagonalization and
 Levenshtein):
-dice + Levenshtein ratio - abs(i/j-len(f)/len(e)) >= threshold (0.5)
+dice + Levenshtein ratio - abs(i/j-len(f)/len(e)) >= threshold (0.5),
+weighted,
+and choosing only the max for each e_i and each f_j
 (I am quite new to Python so I am partly using this exercise to learn Python... I
 don't feel like implementing stuff like IBM model 1 in Python yet...)
 
