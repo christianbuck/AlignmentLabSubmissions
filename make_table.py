@@ -37,7 +37,7 @@ class Scorer(object):
         out,err = process.communicate(open(filename).read())
         map(sys.stderr.write, err)
         map(sys.stderr.write, out)
-        precision, recall, aer = 0.0, 0.0, 0.0
+        precision, recall, aer = 0.0, 0.0, 1.0
         #look for output like this:
         #    Precision = 0.235149
         #    Recall = 0.594675
